@@ -3,8 +3,16 @@
 
 /*Facilitadores*/
 mina((X,Y)):- mina(X,Y).
-not_member(_, []):- !.
-not_member(E, [H|T]):- E \= H, not_member(E, T).
+
+findDimensions(M, Num_Rows, Num_Cols):- findDimensionsX(M, Num_Rows), findDimensionsY(M, Num_Cols).
+
+findDimensionsX([(X,_)], X).
+findDimensionsX([(X,_)|T], X):- findDimensionsX(T, R), X > R, !.
+findDimensionsX([_|T], R):- findDimensionsX(T, R).
+
+findDimensionsY([(_,Y)], Y).
+findDimensionsY([(_,Y)|T], Y):- findDimensionsY(T, C), Y > C, !.
+findDimensionsY([_|T], C):- findDimensionsY(T, C).
 
 /*Preenche o mapa M com zeros*/
 fillRow([], _ , 0).
@@ -20,8 +28,10 @@ alterRow([H|T], Pos, Val, L):- Pos2 is Pos -1, Pos > 1, alterRow(T, Pos2, Val, L
 alterValue([H|T], (Row, Column), Value, [L|T]):- Row=1, alterRow(H, Column, Value, L).
 alterValue([H|T], (Row, Column), Value, M):- Row2 is Row -1, Row > 1, alterValue(T, (Row2, Column), Value, M2), append([H], M2, M).
 
-buildMineList([], L):- mina(X,Y), buildMineList([(X,Y)], L).
-buildMineList(L, L2):- mina(X,Y), not_member((X,Y), L), append((X,Y), L, L2).
-buildMineList(L):- buildMineList([], L).
+setupEnvironment(Map):- findall((X,Y), mina((X,Y)), Mines),
+						findDimensions(Mines, Rows, Cols),
+						fillZeros(ZeroMap, Rows, Cols),
+						setupMines(ZeroMap, Mines, Map).
 
-%% allMines([H|T]):- .
+setupMines(Map, [], Map).
+setupMines(ZMap, [H|T], Final_Field):- setupMines(ZMap, T, Field), alterValue(Field, H, m, Final_Field).

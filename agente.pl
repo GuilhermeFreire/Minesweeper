@@ -16,9 +16,15 @@ diff([X|T1],L2,R):-diff(T1,L2,R).
 
 /*inicio do jogo*/
 /*escolhe uma posição aleatoria do mapa para fazer a 1 jogada*/
+/*ele nao vai chutar uma casa que ja foi marcada com uma flag de bomba*/
 
-chutaPosicao(X,Y):-dim(DimX,DimY), random_between(1,DimX,X),
-			 random_between(1,DimY,Y).
+chutaPosicao(X,Y):-dim(DimX,DimY), 
+			random_between(1,DimX,X),
+			random_between(1,DimY,Y),
+			not(flag(X,Y)),!.
+
+chutaPosicao(X,Y):-chutaPosicao(X,Y).
+
 
 startGame():- chutaPosicao(X,Y),
 		posicao(X,Y),

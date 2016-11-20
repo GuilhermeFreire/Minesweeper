@@ -11,6 +11,7 @@
 
 :- dynamic known/3.
 
+
 posicao(Row, Col):- prevCalled(Row, Col), !.
 
 posicao(Row, Col):- valor(Row, Col, Val),
@@ -18,6 +19,7 @@ posicao(Row, Col):- valor(Row, Col, Val),
 					!,
 					assert(prevCalled(Row, Col)),
 					assert(known(Row, Col, Val)),
+					format("Casa(~w, ~w): ~w ~n", [Row, Col, Val]),
 					A is Row - 1,
 					B is Row + 1,
 					C is Col -1,
@@ -33,5 +35,5 @@ posicao(Row, Col):- valor(Row, Col, Val),
 					format("Casa(~w, ~w): ~w ~n", [Row, Col, Val]).
 					%% print(Val).
 
-posicao(Row , Col):- mina(Row, Col), !, assert(prevCalled(Row, Col)), assert(known(Row, Col, mina)), format("Casa(~w, ~w): Mina~n", [Row, Col]).
+posicao(Row , Col):- mina(Row, Col), !, assert(prevCalled(Row, Col)), assert(knownMines(Row, Col)), format("Casa(~w, ~w): Mina~n", [Row, Col]).
 posicao(_, _).

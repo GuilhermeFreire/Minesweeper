@@ -1,5 +1,5 @@
 /*Carrega o arquivo mina.pl*/
-:- ensure_loaded(mina2).
+:- ensure_loaded(mina).
 
 /*Facilitadores*/
 mina((X,Y)):- mina(X,Y).
@@ -47,10 +47,14 @@ neighborsMines([H|T],Count):- neighborsMines(T,Count).
   
 
 createFile():- open("ambiente.pl", write, Stream), setupEnvironment(Stream), close(Stream).
+createFile(DimX, DimY):- open("ambiente.pl", write, Stream), setupEnvironment(DimX,DimY,Stream), close(Stream).
 
 
 setupEnvironment(Stream):- findall((X,Y), mina((X,Y)), Mines),
 			   findDimensions(Mines, Rows, Cols),
+			   format(Stream, "dim(~w, ~w).~n", [Rows, Cols]),
+			   length(Mines, NMinas), 
+			   format(Stream, "contMina(~w).~n", [NMinas]),
 			   setupMines(Rows, Cols, Stream).
 
 findNeighbors((X,Y),[(A,C),(X,C),(B,C),(A,Y),(B,Y),(A,D),(X,D),(B,D)]):- A is X-1, B is X+1, C is Y-1, D is Y+1.

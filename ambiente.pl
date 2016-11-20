@@ -1,3 +1,5 @@
+dim(4, 5).
+contMina(3).
 valor(4, 1, 0).
 valor(4, 2, 0).
 valor(4, 3, 0).

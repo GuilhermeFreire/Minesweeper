@@ -6,7 +6,8 @@ known((X,Y,V)):- known(X,Y,V).
 randomMove:-.
 
 start:- randomMove,
-		findall(X, ).
+		findall(X, known(X), L),
+		.
 
 /*oioi*/
 

@@ -53,7 +53,8 @@ proximaJogada():-fimDeJogo().
 
 
 %%retorna lista das casas que podem ser jogadas (fechadas)
-vizinhosFechados(X,Y, Fechados):- findNeighbors((X,Y), L), vizinhosAbertos(X,Y, Abertos), diff(L, Abertos, Fechados).  
+vizinhosFechados(X,Y, Fechados):- findNeighbors((X,Y), L), vizinhosAbertos(X,Y, Abertos), diff(L, Abertos, Fechados).
+vizinhosFechadosSemFlag(X,Y, Fechados):- vizinhosFechados(X,Y,VizFechados), vizinhosFlag(X,Y,Flagados), diff(VizFechados,Flagados,Fechados).
 
 %%retorna lista das casas ja descobertas
 vizinhosAbertos(X,Y, Abertos):- findNeighbors((X,Y), L),
@@ -92,10 +93,13 @@ filterNeighbors([H|T], Out):- filterNeighbors(T, Out).
 
 %%caso base 1, numero de casas fechadas = valor da casa (logo todas sao bombas)
 casoBase1(X,Y,1):-known(X,Y, Val), 
-		vizinhosFechados(X, Y, Fechados), 
-		length(Fechados, Nfechados), 
-		Val > 0,		
-		Val=Nfechados,!,		
+		vizinhosFechadosSemFlag(X, Y, Fechados),
+		vizinhosFlag(X,Y,Flagados),
+		length(Fechados, Nfechados),
+		length(Flagados, Nflagados),
+		Val2 is Val - Nflagados,	
+		Val2 > 0,
+		Val2 = Nfechados,!,		
 		marcaFlag(Fechados),
 		format("casobase1(~w) ~n", [(X,Y)]).
 
@@ -126,10 +130,59 @@ casoBase2(_,_,0).
 abreCasas([]).
 abreCasas([(X,Y)|T]):- posicao(X,Y), abreCasas(T).
 
-%%caso base 3 (pra nao esquecer)
+%%caso base 3 (analise multimina para marcar flags)
+casoBase3(X,Y,M):-	vizinhosAbertos(X,Y,Abertos),
+					vizinhosFechadosSemFlag(X,Y,Fechados),
+					known(X,Y,Val),
+					parseCasobase3(Abertos,Fechados,Val, M).
 
 
+parseCasobase3([], _, _, 0).
 
+parseCasobase3([(X,Y)|T],Fechados, Val, 1):- vizinhosFechadosSemFlag(X,Y,VizFechados),
+											vizinhosFlag(X,Y,Flagados),
+											length(Flagados,Nflagados),
+											known(X,Y,Val4),
+											Val2 is Val4 - Nflagados,
+											diff(Fechados,VizFechados,Restantes),
+											Fechados \= Restantes,
+											Val3 is Val - Val2,
+											Val3 > 0,
+											length(Restantes,Tam),
+											Val3 = Tam, !,
+											marcaFlag(Restantes),
+											format("casobase3(~w) ~n", [(X,Y)]).
+
+parseCasobase3([H|T], Fechados, Val, M):- parseCasobase3(T, Fechados, Val, M).
+
+%%caso base 4 (analise multimina para abrir casas)
+casoBase4(X,Y,M):- vizinhosAbertos(X,Y,Abertos), 
+				vizinhosFechadosSemFlag(X,Y, Fechados),
+				known(X,Y,Val2),
+				vizinhosFlag(X,Y,Flagados),
+				length(Flagados,Nflagados),
+				Val is Val2 - Nflagados,
+				Val > 0,
+				parseCasobase4(Abertos,Fechados,Val, M).
+
+
+parseCasobase4([], _, _, 0).
+
+parseCasobase4([(X,Y)|T],Fechados,Val, 1):- vizinhosFechadosSemFlag(X,Y,VizFechados),
+											vizinhosFlag(X,Y,Flagados),
+											length(Flagados,Nflagados),
+											known(X,Y,Val4),
+											Val2 is Val4 - Nflagados,
+											diff(VizFechados,Fechados,Restantes),
+											Restantes = [],
+											diff(Fechados,VizFechados,Seguros),
+											length(Seguros,Tam),
+											Val3 is Val - Val2,
+											Val3 = 0, !,
+											abreCasas(Seguros),
+											format("casobase4(~w) ~n", [(X,Y)]).
+
+parseCasobase4([H|T], Fechados, Val, M):- parseCasobase4(T, Fechados, Val, M).
 
 %%caso chute
 
@@ -141,6 +194,11 @@ fazJogada(1):- findall((X2,Y2), known(X2,Y2, _), L),
 			parseCasa(L,M),
 			M > 0, !.
 
+fazJogada(1):- findall((X2,Y2), known(X2,Y2, _), L),
+			format("findall(~w) ~n", [L]),
+			parseCasa2(L,M),
+			M > 0, !.
+
 fazJogada(0):- chutaPosicao(X,Y),
 		format("chutei(~w) ~n", [(X,Y)]), 
 		posicao(X,Y), mina(X,Y),!.
@@ -149,7 +207,6 @@ fazJogada(1).
 
 			
 
-
 parseCasa([],0).
 parseCasa([(X,Y)|T],M4):- parseCasa(T, M3), format("parse(~w) ~n", [[(X,Y)|T]]),
 			casoBase1(X,Y,M1), 
@@ -157,6 +214,12 @@ parseCasa([(X,Y)|T],M4):- parseCasa(T, M3), format("parse(~w) ~n", [[(X,Y)|T]]),
 			M is M1+M2, 
 			M4 is M3 + M.
 
+parseCasa2([],0).
+parseCasa2([(X,Y)|T],M4):- parseCasa2(T, M3), format("parse2(~w) ~n", [[(X,Y)|T]]),
+			casoBase3(X,Y,M1), 
+			casoBase4(X,Y,M2), 
+			M is M1+M2, 
+			M4 is M3 + M.
 
 
 

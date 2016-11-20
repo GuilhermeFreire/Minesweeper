@@ -4,3 +4,49 @@
 3 | 1 | 1 | 0 | 1 | X |
 4 | 1 | 1 | 0 | 1 | 1 |
 5 | X | 1 | 0 | 0 | 0 |
+
+
+
+
+
+    1   2   3   4   5   
+1 |   | X | 1 | 0 | 0 |
+2 |   | 3 | 1 | 1 | 1 |
+3 |   | 1 | 0 | 1 | X |
+4 |   | 1 | 0 | 1 | 1 |
+5 |   | 1 | 0 | 0 | 0 |
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+//Preprocessamento
+Itera sobre todos os abertos:
+	valor(X,Y,Val)
+	possibleMines(X,Y, Val2).
+	if(Val < Val2):
+		retract(possibleMines(X,Y,_)).
+		assert(possibleMine(X,Y, Val)).
+
+Itera sobre todos os abertos:
+
+
+Itera sobre todos os abertos:
+	gera bloco de todos os vizinhos fechados com Val minas.
+	elimina todas as casas com flag e subtrai do número de minas.
+	Itera sobre todos os outros abertos:
+		gera bloco de todos os fechados com Val2 minas.
+		calcula interseção entre os dois blocos com o menor Val.
+		Elimina as casas da interseção e subtrai o valor delas do contador de minas.
+		Verifica se com as casas restantes e o novo número de minas, caiu no casoBase 1 ou 2.

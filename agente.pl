@@ -7,3 +7,19 @@ randomMove:-.
 
 start:- randomMove,
 		findall(X, ).
+
+/*oioi*/
+
+/*inicio do jogo*/
+/*escolhe uma posição aleatoria do mapa para fazer a 1 jogada*/
+
+:- ensure_loaded(engine2).
+
+setJogadaInicial(X,Y):-random_between(1,LarguraDoTabuleiro,X),
+			 random_between(1,AlturaDoTabuleiro,Y).
+
+startGame():- setJogadaInicial(X,Y),
+		posicao(X,Y),
+		proximaJogada().
+
+proximaJogada:- not()

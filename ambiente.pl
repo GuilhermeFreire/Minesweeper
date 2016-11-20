@@ -1,0 +1,14 @@
+valor(5, 2, 1).
+valor(5, 3, 1).
+valor(4, 1, 1).
+valor(4, 2, 1).
+valor(4, 3, 1).
+valor(4, 4, 1).
+valor(3, 1, 1).
+valor(3, 2, 1).
+valor(3, 3, 0).
+valor(3, 4, 0).
+valor(2, 2, 4).
+valor(2, 3, 2).
+valor(2, 4, 1).
+valor(1, 4, 1).

@@ -14,8 +14,3 @@ valor(4, 3, 0).
 valor(3, 4, 2).
 valor(4, 4, 1).
 
-/*JOGADA 3*/
-posicao(2, 1).
-/*AMBIENTE*/
-jogo encerrado
-

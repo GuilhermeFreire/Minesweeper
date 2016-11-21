@@ -21,7 +21,8 @@ diff([X|T1],L2,R):-diff(T1,L2,R).
 chutaPosicao(X,Y):-dim(DimX,DimY), 
 			random_between(1,DimX,X),
 			random_between(1,DimY,Y),
-			not(flag(X,Y)),!.
+			not(flag(X,Y)),
+			not(known(X,Y,_)),!.
 
 chutaPosicao(X,Y):-chutaPosicao(X,Y).
 
@@ -33,7 +34,16 @@ startGame():- chutaPosicao(X,Y),
 
 startGame():- fimDeJogo().
 
-fimDeJogo():- print("cabo").
+fimDeJogo():- dim(DimX, DimY),
+		Ncasas is DimX*DimY,
+		findall((X2,Y2), known(X2,Y2), L),
+		length(L, CasasAbertas),
+		CasasFechadas is Ncasas-CasasAbertas,
+		contMina(NMinas),
+		CasasFechadas = NMinas,
+		format("~nYou Win!").
+
+fimDeJogo():- format("~nYou Lose!").
 
 proximaJogada():- fazJogada(KeepPlaying),
 		KeepPlaying \= 0,
@@ -46,7 +56,7 @@ proximaJogada():- fazJogada(KeepPlaying),
 		CasasFechadas>NMinas,
 		proximaJogada().
 
-proximaJogada():-fimDeJogo().
+proximaJogada():- fimDeJogo().
 
 
 
@@ -100,14 +110,14 @@ casoBase1(X,Y,1):-known(X,Y, Val),
 		Val2 is Val - Nflagados,	
 		Val2 > 0,
 		Val2 = Nfechados,!,		
-		marcaFlag(Fechados),
-		format("casobase1(~w) ~n", [(X,Y)]).
+		format("~nUsando casobase1(~w) ~n", [(X,Y)]),
+		marcaFlag(Fechados).
 
 casoBase1(_,_,0).
 
 marcaFlag([]).
 marcaFlag([(X,Y)|T]):- flag(X,Y),!, marcaFlag(T).
-marcaFlag([(X,Y)|T]):- assert(flag(X,Y)), marcaFlag(T).
+marcaFlag([(X,Y)|T]):- format("flag(~w) ~n", [(X,Y)]), assert(flag(X,Y)), marcaFlag(T).
 
 
 
@@ -122,8 +132,8 @@ casoBase2(X,Y,1):-known(X,Y, Val),
 		length(Fechados, NFechados),
 		NFechados > Nflagados,!,
 		diff(Fechados, Flagados, Seguros),
-		abreCasas(Seguros),
-		format("casobase2(~w) ~n", [(X,Y)]).
+		format("~nUsando casobase2(~w) ~n", [(X,Y)]),
+		abreCasas(Seguros).
 
 casoBase2(_,_,0).
 
@@ -150,8 +160,8 @@ parseCasobase3([(X,Y)|T],Fechados, Val, 1):- vizinhosFechadosSemFlag(X,Y,VizFech
 											Val3 > 0,
 											length(Restantes,Tam),
 											Val3 = Tam, !,
-											marcaFlag(Restantes),
-											format("casobase3(~w) ~n", [(X,Y)]).
+											format("casobase3(~w) ~n", [(X,Y)]),
+											marcaFlag(Restantes).
 
 parseCasobase3([H|T], Fechados, Val, M):- parseCasobase3(T, Fechados, Val, M).
 
@@ -162,8 +172,10 @@ casoBase4(X,Y,M):- vizinhosAbertos(X,Y,Abertos),
 				vizinhosFlag(X,Y,Flagados),
 				length(Flagados,Nflagados),
 				Val is Val2 - Nflagados,
-				Val > 0,
+				Val > 0, !,
 				parseCasobase4(Abertos,Fechados,Val, M).
+
+casobase4(_,_,0).
 
 
 parseCasobase4([], _, _, 0).
@@ -178,24 +190,20 @@ parseCasobase4([(X,Y)|T],Fechados,Val, 1):- vizinhosFechadosSemFlag(X,Y,VizFecha
 											diff(Fechados,VizFechados,Seguros),
 											length(Seguros,Tam),
 											Val3 is Val - Val2,
-											Val3 = 0, !,
-											abreCasas(Seguros),
-											format("casobase4(~w) ~n", [(X,Y)]).
+											Val3 = 0, Tam > 0, !,
+											format("casobase4(~w) ~n", [(X,Y)]),
+											abreCasas(Seguros).
 
 parseCasobase4([H|T], Fechados, Val, M):- parseCasobase4(T, Fechados, Val, M).
-
-%%caso chute
 
 
 
 %%loop de jogadas
 fazJogada(1):- findall((X2,Y2), known(X2,Y2, _), L),
-			format("findall(~w) ~n", [L]),
 			parseCasa(L,M),
 			M > 0, !.
 
 fazJogada(1):- findall((X2,Y2), known(X2,Y2, _), L),
-			format("findall(~w) ~n", [L]),
 			parseCasa2(L,M),
 			M > 0, !.
 
@@ -208,14 +216,14 @@ fazJogada(1).
 			
 
 parseCasa([],0).
-parseCasa([(X,Y)|T],M4):- parseCasa(T, M3), format("parse(~w) ~n", [[(X,Y)|T]]),
+parseCasa([(X,Y)|T],M4):- parseCasa(T, M3),
 			casoBase1(X,Y,M1), 
 			casoBase2(X,Y,M2), 
 			M is M1+M2, 
 			M4 is M3 + M.
 
 parseCasa2([],0).
-parseCasa2([(X,Y)|T],M4):- parseCasa2(T, M3), format("parse2(~w) ~n", [[(X,Y)|T]]),
+parseCasa2([(X,Y)|T],M4):- parseCasa2(T, M3),
 			casoBase3(X,Y,M1), 
 			casoBase4(X,Y,M2), 
 			M is M1+M2, 

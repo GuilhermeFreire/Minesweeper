@@ -200,12 +200,13 @@ parseCasobase4([H|T], Fechados, Val, M, Xpai, Ypai):- parseCasobase4(T, Fechados
 
 %%loop de jogadas
 fazJogada(1):- findall((X2,Y2), known(X2,Y2, _), L),
-			parseCasa(L,M),
+			parseCasa2(L,M),
 			M > 0, !.
 
 fazJogada(1):- findall((X2,Y2), known(X2,Y2, _), L),
-			parseCasa2(L,M),
+			parseCasa(L,M),
 			M > 0, !.
+
 
 fazJogada(0):- chutaPosicao(X,Y),
 		format("chutei(~w) ~n", [(X,Y)]), 

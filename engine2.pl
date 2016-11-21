@@ -1,5 +1,5 @@
 /*Carrega o arquivo mina.pl*/
-:- ensure_loaded(mina2).
+:- ensure_loaded(mina).
 /*Carrega o arquivo mina.pl*/
 :- ensure_loaded(ambiente).
 

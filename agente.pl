@@ -173,8 +173,7 @@ casoBase4(X,Y,M):- vizinhosAbertos(X,Y,Abertos),
 				length(Flagados,Nflagados),
 				Val is Val2 - Nflagados,
 				Val > 0, !,
-				parseCasobase4(Abertos,Fechados,Val, M, X, Y),
-				print(M).
+				parseCasobase4(Abertos,Fechados,Val, M, X, Y).
 
 casobase4(_,_,0).
 

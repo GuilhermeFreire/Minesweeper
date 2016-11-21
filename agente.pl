@@ -144,12 +144,12 @@ abreCasas([(X,Y)|T]):- posicao(X,Y), abreCasas(T).
 casoBase3(X,Y,M):-	vizinhosAbertos(X,Y,Abertos),
 					vizinhosFechadosSemFlag(X,Y,Fechados),
 					known(X,Y,Val),
-					parseCasobase3(Abertos,Fechados,Val, M).
+					parseCasobase3(Abertos,Fechados,Val, M, X, Y).
 
 
-parseCasobase3([], _, _, 0).
+parseCasobase3([], _, _, 0, _, _).
 
-parseCasobase3([(X,Y)|T],Fechados, Val, 1):- vizinhosFechadosSemFlag(X,Y,VizFechados),
+parseCasobase3([(X,Y)|T],Fechados, Val, 1, Xpai, Ypai):- vizinhosFechadosSemFlag(X,Y,VizFechados),
 											vizinhosFlag(X,Y,Flagados),
 											length(Flagados,Nflagados),
 											known(X,Y,Val4),
@@ -160,10 +160,10 @@ parseCasobase3([(X,Y)|T],Fechados, Val, 1):- vizinhosFechadosSemFlag(X,Y,VizFech
 											Val3 > 0,
 											length(Restantes,Tam),
 											Val3 = Tam, !,
-											format("casobase3(~w) ~n", [(X,Y)]),
+											format("~nUsando casobase3 (~w, ~w) e (~w, ~w)~n", [Xpai,Ypai,X,Y]),
 											marcaFlag(Restantes).
 
-parseCasobase3([H|T], Fechados, Val, M):- parseCasobase3(T, Fechados, Val, M).
+parseCasobase3([H|T], Fechados, Val, M, Xpai, Ypai):- parseCasobase3(T, Fechados, Val, M, Xpai, Ypai).
 
 %%caso base 4 (analise multimina para abrir casas)
 casoBase4(X,Y,M):- vizinhosAbertos(X,Y,Abertos), 
@@ -173,14 +173,15 @@ casoBase4(X,Y,M):- vizinhosAbertos(X,Y,Abertos),
 				length(Flagados,Nflagados),
 				Val is Val2 - Nflagados,
 				Val > 0, !,
-				parseCasobase4(Abertos,Fechados,Val, M).
+				parseCasobase4(Abertos,Fechados,Val, M, X, Y),
+				print(M).
 
 casobase4(_,_,0).
 
 
-parseCasobase4([], _, _, 0).
+parseCasobase4([], _, _, 0, _, _).
 
-parseCasobase4([(X,Y)|T],Fechados,Val, 1):- vizinhosFechadosSemFlag(X,Y,VizFechados),
+parseCasobase4([(X,Y)|T],Fechados,Val, 1, Xpai, Ypai):- vizinhosFechadosSemFlag(X,Y,VizFechados),
 											vizinhosFlag(X,Y,Flagados),
 											length(Flagados,Nflagados),
 											known(X,Y,Val4),
@@ -191,10 +192,10 @@ parseCasobase4([(X,Y)|T],Fechados,Val, 1):- vizinhosFechadosSemFlag(X,Y,VizFecha
 											length(Seguros,Tam),
 											Val3 is Val - Val2,
 											Val3 = 0, Tam > 0, !,
-											format("casobase4(~w) ~n", [(X,Y)]),
+											format("~nUsando casobase4 (~w, ~w) e (~w, ~w)~n", [Xpai,Ypai,X,Y]),
 											abreCasas(Seguros).
 
-parseCasobase4([H|T], Fechados, Val, M):- parseCasobase4(T, Fechados, Val, M).
+parseCasobase4([H|T], Fechados, Val, M, Xpai, Ypai):- parseCasobase4(T, Fechados, Val, M, Xpai, Ypai).
 
 
 
